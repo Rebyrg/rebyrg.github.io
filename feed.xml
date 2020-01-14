@@ -5,8 +5,8 @@
     <description>Dev site of DevOps blog by Rebyrg.</description>
     <link>https://rebyrg.github.io/</link>
     <atom:link href="https://rebyrg.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 14 Jan 2020 20:41:28 +0100</pubDate>
-    <lastBuildDate>Tue, 14 Jan 2020 20:41:28 +0100</lastBuildDate>
+    <pubDate>Tue, 14 Jan 2020 20:52:10 +0100</pubDate>
+    <lastBuildDate>Tue, 14 Jan 2020 20:52:10 +0100</lastBuildDate>
     <generator>Jekyll v3.8.6</generator>
     
       <item>
@@ -27,7 +27,7 @@
     
       <item>
         <title>Kubernetes demo</title>
-        <description>&lt;h1 id=&quot;demonstration-scenario&quot;&gt;Demonstration scenario&lt;/h1&gt; &lt;h2 id=&quot;prerequirements&quot;&gt;Prerequirements&lt;/h2&gt; &lt;ol&gt; &lt;li&gt;Before you begin ensure that you have installed on your PC: &lt;ul&gt; &lt;li&gt;Java SDK 1.8&lt;/li&gt; &lt;li&gt;maven&lt;/li&gt; &lt;li&gt;Docker&lt;/li&gt; &lt;li&gt;kubectl&lt;/li&gt; &lt;li&gt;&lt;a href=&quot;https://github.com/kubernetes/minikube&quot;&gt;minikube&lt;/a&gt;&lt;/li&gt; &lt;/ul&gt; &lt;/li&gt; &lt;li&gt;Configure minikube - add heapster addon and connect its docker demon: &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;minikube addons enable heapster minikube start eval $(minikube docker-env) &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt; &lt;/div&gt; &lt;/li&gt; &lt;li&gt;Build the application and the docker image: &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mvn clean package docker build -t k8s-demo-currency-provider:0.0.1 . &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt; &lt;/div&gt; &lt;p&gt;You don’t have to push docker image to a registry thanks to using &lt;code class=&quot;highlighter-rouge&quot;&gt;eval $(minikube docker-env)&lt;/code&gt; and imagePullPolicy set to IfNotPresent in all examples below.&lt;/p&gt;...</description>
+        <description>&lt;h1 id=&quot;demonstration-scenario&quot;&gt;Demonstration scenario&lt;/h1&gt; &lt;h2 id=&quot;prerequirements&quot;&gt;Prerequirements&lt;/h2&gt; &lt;h3 id=&quot;1-before-you-begin-ensure-that-you-have-installed-on-your-pc&quot;&gt;1. Before you begin ensure that you have installed on your PC:&lt;/h3&gt; &lt;ul&gt; &lt;li&gt;Java SDK 1.8&lt;/li&gt; &lt;li&gt;maven&lt;/li&gt; &lt;li&gt;Docker&lt;/li&gt; &lt;li&gt;kubectl&lt;/li&gt; &lt;li&gt;&lt;a href=&quot;https://github.com/kubernetes/minikube&quot;&gt;minikube&lt;/a&gt;&lt;/li&gt; &lt;/ul&gt; &lt;h3 id=&quot;2-configure-minikube-add-heapster-addon-and-connect-its-docker-demon&quot;&gt;2. Configure minikube - add heapster addon and connect its docker demon:&lt;/h3&gt; &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;minikube addons enable heapster minikube start eval $(minikube docker-env) &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt; &lt;h3 id=&quot;3-build-the-application-and-the-docker-image&quot;&gt;3. Build the application and the docker image:&lt;/h3&gt; &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mvn clean package docker build -t k8s-demo-currency-provider:0.0.1 . &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt; &lt;p&gt;You don’t have to push docker image to a registry thanks to using &lt;code class=&quot;highlighter-rouge&quot;&gt;eval $(minikube docker-env)&lt;/code&gt; and imagePullPolicy set to IfNotPresent in all examples...</description>
         <pubDate>Sun, 16 Jul 2017 01:48:05 +0200</pubDate>
         <link>https://rebyrg.github.io/kubernetes-demo/2/</link>
         <guid isPermaLink="true">https://rebyrg.github.io/kubernetes-demo/2/</guid>

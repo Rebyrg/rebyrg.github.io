@@ -229,33 +229,31 @@ July 16, 2017
                 
 <h1 id="demonstration-scenario">Demonstration scenario</h1>
 <h2 id="prerequirements">Prerequirements</h2>
+<h3 id="1-before-you-begin-ensure-that-you-have-installed-on-your-pc">1. Before you begin ensure that you have installed on your PC:</h3>
 
-<ol>
-  <li>Before you begin ensure that you have installed on your PC:
-    <ul>
-      <li>Java SDK 1.8</li>
-      <li>maven</li>
-      <li>Docker</li>
-      <li>kubectl</li>
-      <li><a href="https://github.com/kubernetes/minikube">minikube</a></li>
-    </ul>
-  </li>
-  <li>Configure minikube - add heapster addon and connect its docker demon:
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>minikube addons enable heapster
+<ul>
+  <li>Java SDK 1.8</li>
+  <li>maven</li>
+  <li>Docker</li>
+  <li>kubectl</li>
+  <li><a href="https://github.com/kubernetes/minikube">minikube</a></li>
+</ul>
+
+<h3 id="2-configure-minikube-add-heapster-addon-and-connect-its-docker-demon">2. Configure minikube - add heapster addon and connect its docker demon:</h3>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>minikube addons enable heapster
 minikube start
 eval $(minikube docker-env)
-</code></pre></div>    </div>
-  </li>
-  <li>Build the application and the docker image:
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn clean package
-docker build -t k8s-demo-currency-provider:0.0.1 .
-</code></pre></div>    </div>
-    <p>You don’t have to push docker image to a registry thanks to using <code class="highlighter-rouge">eval $(minikube docker-env)</code> 
-and imagePullPolicy set to IfNotPresent in all examples below.</p>
-  </li>
-</ol>
+</code></pre></div></div>
+<h3 id="3-build-the-application-and-the-docker-image">3. Build the application and the docker image:</h3>
 
-<h6 id="notice-">Notice</h6>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn clean package
+docker build -t k8s-demo-currency-provider:0.0.1 .
+</code></pre></div></div>
+<p>You don’t have to push docker image to a registry thanks to using <code class="highlighter-rouge">eval $(minikube docker-env)</code> 
+and imagePullPolicy set to IfNotPresent in all examples below.</p>
+
+<h4 id="notice-">Notice</h4>
 
 <p>If the demonstration is on a real kubernetes cluster connected to private registry you should modify command above and run</p>
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker build -t registry.example.com/k8s-demo-currency-provider:0.0.1 .
@@ -590,31 +588,29 @@ curl "$DEMO_IP:$DEMO_PORT/rate?source=EUR&amp;destination=USD"
             "articleBody": "
 Demonstration scenario
 Prerequirements
+1. Before you begin ensure that you have installed on your PC:
 
 
-  Before you begin ensure that you have installed on your PC:
-    
-      Java SDK 1.8
-      maven
-      Docker
-      kubectl
-      minikube
-    
-  
-  Configure minikube - add heapster addon and connect its docker demon:
-    minikube addons enable heapster
+  Java SDK 1.8
+  maven
+  Docker
+  kubectl
+  minikube
+
+
+2. Configure minikube - add heapster addon and connect its docker demon:
+
+minikube addons enable heapster
 minikube start
 eval $(minikube docker-env)
-    
-  
-  Build the application and the docker image:
-    mvn clean package
-docker build -t k8s-demo-currency-provider:0.0.1 .
-    
-    You don’t have to push docker image to a registry thanks to using eval $(minikube docker-env) 
-and imagePullPolicy set to IfNotPresent in all examples below.
-  
 
+3. Build the application and the docker image:
+
+mvn clean package
+docker build -t k8s-demo-currency-provider:0.0.1 .
+
+You don’t have to push docker image to a registry thanks to using eval $(minikube docker-env) 
+and imagePullPolicy set to IfNotPresent in all examples below.
 
 Notice
 
@@ -668,7 +664,7 @@ curl &quot;$DEMO_IP:$DEMO_PORT/rate?source=EUR&amp;amp;destination=USD&quot;
 
 You can replay test of changing configuration from previous scenario and check application response after changed configuration and then pod restarted.
 ",
-            "wordcount": "758",
+            "wordcount": "757",
             "inLanguage": "en",
             "dateCreated": "2017-07-16/",
             "datePublished": "2017-07-16/",

@@ -218,18 +218,14 @@ It also shows basic principles of creating spring boot applications which are de
 The rate service returns a rate for a pair of currencies, e.g. it returns 1.0 value for EUR/USD. 
 The rate service works in two modes, each created for a different purpose.</p>
 
-<ol>
-  <li>Checking if application is serving proper output</li>
-</ol>
+<h2 id="1-checking-if-application-is-serving-proper-output">1. Checking if application is serving proper output</h2>
 
 <p>When service is executed with EUR/USD pair it returns a constant value defined in attribute <code class="highlighter-rouge">eurUsdRate</code> 
 of <code class="highlighter-rouge">CurrencyProviderRest</code> class.
 It is normal, fast operation with low latency. 
 It always returns the same value until you change the constant in sources and build a new version of the application.</p>
 
-<ol>
-  <li>Emulating high CPU load operation</li>
-</ol>
+<h2 id="2-emulating-high-cpu-load-operation">2. Emulating high CPU load operation</h2>
 
 <p>Executing service with any other then EUR/USD values, e.g. PLN/EUR, causes special <strong>rate wizzard</strong> feature will be used. The feature is implemented 
 in <code class="highlighter-rouge">rateWizzard</code> method of <code class="highlighter-rouge">CurrencyProviderRest</code> class. 
@@ -241,15 +237,15 @@ So when the variable <code class="highlighter-rouge">SPREAD</code>is set to 0.00
 
 <p>The application uses spring boot actuator /health endpoint to provide health checks.</p>
 
-<h6 id="usage-">Usage:</h6>
+<h3 id="usage-">Usage:</h3>
 
 <p><code class="highlighter-rouge">http:&lt;host&gt;:&lt;port&gt;/rate?source=A&amp;destination=B</code> gets rate for currency A/B, e.g. get the rate of currency pair 
 EUR/USD by executing <code class="highlighter-rouge">http://localhost:8080/rate?source=EUR&amp;destination=USD</code></p>
-<h6 id="build">Build:</h6>
+<h3 id="build">Build:</h3>
 
 <p>Command <code class="highlighter-rouge">mvn clean package</code> creates jar file <code class="highlighter-rouge">target/k8s-demo-currency-provider-0.0.1-SNAPSHOT.jar</code>.
 Command <code class="highlighter-rouge">docker build -t k8s-demo-currency-provider:0.0.1 .</code>  builds docker image <code class="highlighter-rouge">k8s-demo-currency-provider</code> and tag it with version <code class="highlighter-rouge">0.0.1</code>.</p>
-<h6 id="deployment">Deployment:</h6>
+<h3 id="deployment">Deployment:</h3>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create -f k8s/k8s-demo-currency.configmap.yaml
 kubectl create -f k8s/k8s-demo-currency-provider.deployment.yaml
@@ -263,33 +259,31 @@ echo "$DEMO_IP:$DEMO_PORT"
 <p>–page-break–</p>
 <h1 id="demonstration-scenario">Demonstration scenario</h1>
 <h2 id="prerequirements">Prerequirements</h2>
+<h3 id="1-before-you-begin-ensure-that-you-have-installed-on-your-pc">1. Before you begin ensure that you have installed on your PC:</h3>
 
-<ol>
-  <li>Before you begin ensure that you have installed on your PC:
-    <ul>
-      <li>Java SDK 1.8</li>
-      <li>maven</li>
-      <li>Docker</li>
-      <li>kubectl</li>
-      <li><a href="https://github.com/kubernetes/minikube">minikube</a></li>
-    </ul>
-  </li>
-  <li>Configure minikube - add heapster addon and connect its docker demon:
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>minikube addons enable heapster
+<ul>
+  <li>Java SDK 1.8</li>
+  <li>maven</li>
+  <li>Docker</li>
+  <li>kubectl</li>
+  <li><a href="https://github.com/kubernetes/minikube">minikube</a></li>
+</ul>
+
+<h3 id="2-configure-minikube-add-heapster-addon-and-connect-its-docker-demon">2. Configure minikube - add heapster addon and connect its docker demon:</h3>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>minikube addons enable heapster
 minikube start
 eval $(minikube docker-env)
-</code></pre></div>    </div>
-  </li>
-  <li>Build the application and the docker image:
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn clean package
-docker build -t k8s-demo-currency-provider:0.0.1 .
-</code></pre></div>    </div>
-    <p>You don’t have to push docker image to a registry thanks to using <code class="highlighter-rouge">eval $(minikube docker-env)</code> 
-and imagePullPolicy set to IfNotPresent in all examples below.</p>
-  </li>
-</ol>
+</code></pre></div></div>
+<h3 id="3-build-the-application-and-the-docker-image">3. Build the application and the docker image:</h3>
 
-<h6 id="notice-">Notice</h6>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn clean package
+docker build -t k8s-demo-currency-provider:0.0.1 .
+</code></pre></div></div>
+<p>You don’t have to push docker image to a registry thanks to using <code class="highlighter-rouge">eval $(minikube docker-env)</code> 
+and imagePullPolicy set to IfNotPresent in all examples below.</p>
+
+<h4 id="notice-">Notice</h4>
 
 <p>If the demonstration is on a real kubernetes cluster connected to private registry you should modify command above and run</p>
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker build -t registry.example.com/k8s-demo-currency-provider:0.0.1 .
@@ -787,18 +781,14 @@ The application exposes only one simple service /rate on spring boot http port (
 The rate service returns a rate for a pair of currencies, e.g. it returns 1.0 value for EUR/USD. 
 The rate service works in two modes, each created for a different purpose.
 
-
-  Checking if application is serving proper output
-
+1. Checking if application is serving proper output
 
 When service is executed with EUR/USD pair it returns a constant value defined in attribute eurUsdRate 
 of CurrencyProviderRest class.
 It is normal, fast operation with low latency. 
 It always returns the same value until you change the constant in sources and build a new version of the application.
 
-
-  Emulating high CPU load operation
-
+2. Emulating high CPU load operation
 
 Executing service with any other then EUR/USD values, e.g. PLN/EUR, causes special rate wizzard feature will be used. The feature is implemented 
 in rateWizzard method of CurrencyProviderRest class. 
@@ -832,31 +822,29 @@ echo &quot;$DEMO_IP:$DEMO_PORT&quot;
 –page-break–
 Demonstration scenario
 Prerequirements
+1. Before you begin ensure that you have installed on your PC:
 
 
-  Before you begin ensure that you have installed on your PC:
-    
-      Java SDK 1.8
-      maven
-      Docker
-      kubectl
-      minikube
-    
-  
-  Configure minikube - add heapster addon and connect its docker demon:
-    minikube addons enable heapster
+  Java SDK 1.8
+  maven
+  Docker
+  kubectl
+  minikube
+
+
+2. Configure minikube - add heapster addon and connect its docker demon:
+
+minikube addons enable heapster
 minikube start
 eval $(minikube docker-env)
-    
-  
-  Build the application and the docker image:
-    mvn clean package
-docker build -t k8s-demo-currency-provider:0.0.1 .
-    
-    You don’t have to push docker image to a registry thanks to using eval $(minikube docker-env) 
-and imagePullPolicy set to IfNotPresent in all examples below.
-  
 
+3. Build the application and the docker image:
+
+mvn clean package
+docker build -t k8s-demo-currency-provider:0.0.1 .
+
+You don’t have to push docker image to a registry thanks to using eval $(minikube docker-env) 
+and imagePullPolicy set to IfNotPresent in all examples below.
 
 Notice
 
@@ -1070,7 +1058,7 @@ After a few minutes, when CPU load decreased, HPA scaled it down to minimum coun
 If during your test HPA did not created a new pod, probably you should increase CPU loads by running additional /rate with rateWizzard  endpoint.
 You can also check ConfigMap and set wizardLoops to a higher value.
 ",
-            "wordcount": "2827",
+            "wordcount": "2826",
             "inLanguage": "en",
             "dateCreated": "2017-07-16/",
             "datePublished": "2017-07-16/",
