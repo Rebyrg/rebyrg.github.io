@@ -189,7 +189,7 @@ July 16, 2017
                         </time>
                     
                     <svg id="clock" class="icon-clock"><use xlink:href="#icon-clock"></use></svg>
-                    <span>2 min to read</span>
+                    <span>4 min to read</span>
                 </p>
                 <h1 class="post-title">Kubernetes demo</h1>
                 <p class="post-subtitle">Demo of basic kubernetes features made for a dev team.</p>
@@ -201,14 +201,14 @@ July 16, 2017
     
     <div class="pagination pagination-post ">
         
-            <a href="/kubernetes-demo/2/">
+            <a href="/kubernetes-demo/3/">
                 
                     
     <div class="progress-bar ">
         
             <div class="bar completed"></div>
         
-            <div class="bar "></div>
+            <div class="bar completed"></div>
         
             <div class="bar "></div>
         
@@ -226,64 +226,86 @@ July 16, 2017
 
 
 
-                <h1 id="intro">Intro</h1>
-
-<p>My notes for demo of kubernetes features made in july 2017 for devs in my company.
-I made it for people who didn’t know what container and kubernetes are.
-I tried to encourage them to start their adventure with kubernets.
-Source code is available here: <a href="https://github.com/Rebyrg/k8s-demo">https://github.com/Rebyrg/k8s-demo</a></p>
-
-<h1 id="application">Application</h1>
-
-<p>It is a very simple spring boot application created for demonstration of basic kubernetes features.
-It also shows basic principles of creating spring boot applications which are deployed on a kubernetes cluster.</p>
-
-<p>The application exposes only one simple service <code class="highlighter-rouge">/rate</code> on spring boot http port (default 8080).
-The rate service returns a rate for a pair of currencies, e.g. it returns 1.0 value for EUR/USD. 
-The rate service works in two modes, each created for a different purpose.</p>
+                
+<h1 id="demonstration-scenario">Demonstration scenario</h1>
+<h2 id="prerequirements">Prerequirements</h2>
 
 <ol>
-  <li>Checking if application is serving proper output</li>
+  <li>Before you begin ensure that you have installed on your PC:
+    <ul>
+      <li>Java SDK 1.8</li>
+      <li>maven</li>
+      <li>Docker</li>
+      <li>kubectl</li>
+      <li><a href="https://github.com/kubernetes/minikube">minikube</a></li>
+    </ul>
+  </li>
+  <li>Configure minikube - add heapster addon and connect its docker demon:
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>minikube addons enable heapster
+minikube start
+eval $(minikube docker-env)
+</code></pre></div>    </div>
+  </li>
+  <li>Build the application and the docker image:
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn clean package
+docker build -t k8s-demo-currency-provider:0.0.1 .
+</code></pre></div>    </div>
+    <p>You don’t have to push docker image to a registry thanks to using <code class="highlighter-rouge">eval $(minikube docker-env)</code> 
+and imagePullPolicy set to IfNotPresent in all examples below.</p>
+  </li>
 </ol>
 
-<p>When service is executed with EUR/USD pair it returns a constant value defined in attribute <code class="highlighter-rouge">eurUsdRate</code> 
-of <code class="highlighter-rouge">CurrencyProviderRest</code> class.
-It is normal, fast operation with low latency. 
-It always returns the same value until you change the constant in sources and build a new version of the application.</p>
+<h6 id="notice-">Notice</h6>
 
-<ol>
-  <li>Emulating high CPU load operation</li>
-</ol>
+<p>If the demonstration is on a real kubernetes cluster connected to private registry you should modify command above and run</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker build -t registry.example.com/k8s-demo-currency-provider:0.0.1 .
+</code></pre></div></div>
+<p>change <code class="highlighter-rouge">registry.example.com</code> to your registry address. You should also modify kubernetes yaml descriptors in 
+k8s directory adding registry prefix in image property of deployments. Also every command operating on image below should be customized. You should also execute <code class="highlighter-rouge">docker push registry.example.com/k8s-demo-currency-provider:0.0.1</code> after <code class="highlighter-rouge">docker build -t registry.example.com/k8s-demo-currency-provider:0.0.1 .</code> command (for application version 0.0.1 as well as 0.0.2 changing registry.example.com/k8s-demo-currency-provider:0.0.1 to registry.example.com/k8s-demo-currency-provider:0.0.2).</p>
 
-<p>Executing service with any other then EUR/USD values, e.g. PLN/EUR, causes special <strong>rate wizzard</strong> feature will be used. The feature is implemented 
-in <code class="highlighter-rouge">rateWizzard</code> method of <code class="highlighter-rouge">CurrencyProviderRest</code> class. 
-The <code class="highlighter-rouge">rateWizzard</code> method uses same mathematics magic that consumes a lot of CPU ;-). 
-Its CPU load and latency depends on value of environment variable <code class="highlighter-rouge">WIZARD_LOOPS</code> passed to the application. The variable <code class="highlighter-rouge">WIZARD_LOOPS</code> takes numbers as values. Setting it to <code class="highlighter-rouge">10000000</code> results approximately 1 second latency (running on Lenovo IdeaPad 710s laptop with i7 7500U CPU).</p>
+<h2 id="deployment-of-sample-spring-boot-application">Deployment of sample spring boot application</h2>
 
-<p>There is also parameter set by environment variable <code class="highlighter-rouge">SPREAD</code> that causes the rate is multiplied by 1 + its value. 
-So when the variable <code class="highlighter-rouge">SPREAD</code>is set to 0.003 it will result the rate for EUR/USD is 1.003 instead of 1.0.</p>
-
-<p>The application uses spring boot actuator /health endpoint to provide health checks.</p>
-
-<h6 id="usage-">Usage:</h6>
-
-<p><code class="highlighter-rouge">http:&lt;host&gt;:&lt;port&gt;/rate?source=A&amp;destination=B</code> gets rate for currency A/B, e.g. get the rate of currency pair 
-EUR/USD by executing <code class="highlighter-rouge">http://localhost:8080/rate?source=EUR&amp;destination=USD</code></p>
-<h6 id="build">Build:</h6>
-
-<p>Command <code class="highlighter-rouge">mvn clean package</code> creates jar file <code class="highlighter-rouge">target/k8s-demo-currency-provider-0.0.1-SNAPSHOT.jar</code>.
-Command <code class="highlighter-rouge">docker build -t k8s-demo-currency-provider:0.0.1 .</code>  builds docker image <code class="highlighter-rouge">k8s-demo-currency-provider</code> and tag it with version <code class="highlighter-rouge">0.0.1</code>.</p>
-<h6 id="deployment">Deployment:</h6>
-
+<p>This is demonstration of most basic kubernetes features. Deploy the application on your kubernetes. 
+Tell kubernetes to do this by creating ConfigMap with application configuration and deployment:</p>
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create -f k8s/k8s-demo-currency.configmap.yaml
 kubectl create -f k8s/k8s-demo-currency-provider.deployment.yaml
-kubectl create -f k8s/k8s-demo-currency-provider.service.yaml
 </code></pre></div></div>
-<p>You can obtain service url running</p>
+<p>Kubernetes allocates all necessary resources for the application and then creates a pod with the application as described 
+in deployment and uses configuration provided in the ConfigMap.
+You can see what happens on the kubernetes dashboard in a browser by executing <code class="highlighter-rouge">minikube dashboard</code> or in terminal <code class="highlighter-rouge">kubectl get pods</code>. 
+You should find newly created, running pod. You can check its logs in the dashboard or by executing <code class="highlighter-rouge">kubectl logs &lt;pod aname&gt;</code>
+You can also see CPU and memory loads of a pod on the dashboard.
+Application configuration is stored in ConfigMap k8s-demo-currency. You can check its content in the dashboard or by executing <code class="highlighter-rouge">kubectl get configmap -o yaml</code>.
+Execute <code class="highlighter-rouge">kubectl exec &lt;pod name&gt; env</code> and find the SPREAD environment variable.
+Change <code class="highlighter-rouge">spread</code> value in the k8s-demo-currency ConfigMap in the dahsboard.
+Again execute <code class="highlighter-rouge">kubectl exec &lt;pod name&gt; env</code> and find the SPREAD environment variable.
+Notice that when you change values in a ConfigMap, the deployment using them will not be notified automatically. 
+You have to manually force restart of the pods managed by deployment. 
+You can do it by deleting pods - kubernetes will create new instances with fresh configuration loaded from changed ConfigMap. Run <code class="highlighter-rouge">kubectl delete &lt;pod aname&gt;</code> or go inside pod by executing <code class="highlighter-rouge">kubectl exec -it &lt;pod aname&gt; /bin/sh</code> and than from the shell of the container kill the java process.
+In the real world to avoid manual restarts you can use tools like helm with charts or consider using immutable ConfigMaps (do not modify ConfigMap when you need to change its value, create a new one and repleace usage of the old one to the newly created). 
+You can not access the application http endpoint. You must create a kubernetes service what is subject of next section.</p>
+
+<h2 id="expose-deployment-on-kubernetes-service">Expose deployment on kubernetes service</h2>
+
+<p>When the pods where created, they are not accessible from outside of the cluster. 
+They are not even accessible for other pods in the same namespace of kubernetes.
+You have to create a service to expose pods ports. It will also provide load balancing of network traffic to our application. 
+By choosing the service type of NodePort you can access it from outside of the cluster.
+Below command creates service of type NodePort on kubernetes for <code class="highlighter-rouge">k8s-demo-currency-provider</code> pods:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create -f k8s/k8s-demo-currency-provider.service.yaml
+</code></pre></div></div>
+<p>It exposes pod’s port 8080 on random generated port for outside access. 
+You can launch a browser with url of created service by executing:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>minikube service k8s-demo-currency-provider
+</code></pre></div></div>
+<p>It will launch browser with correct url containing ip host of minikube and port assigned by kubernetes to <code class="highlighter-rouge">k8s-demo-currency-provider</code> service.
+Add suffix <code class="highlighter-rouge">/rate?source=EUR&amp;destination=USD</code> in the url in browser and ensure that application is running and its response is correct.
+You can also obtain external service url as described in <strong>Deployment</strong> section above.</p>
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>export DEMO_IP=$(kubectl get nodes -o jsonpath="{.items[0].status.addresses[0].address}")
 export DEMO_PORT=$(kubectl get services k8s-demo-currency-provider -o jsonpath="{.spec.ports[0].nodePort}")
-echo "$DEMO_IP:$DEMO_PORT"
+curl "$DEMO_IP:$DEMO_PORT/rate?source=EUR&amp;destination=USD"
 </code></pre></div></div>
+<p>You can replay test of changing configuration from previous scenario and check application response after changed configuration and then pod restarted.</p>
 
 
                 <!-- Pagination links -->
@@ -291,7 +313,7 @@ echo "$DEMO_IP:$DEMO_PORT"
     
     <div class="pagination pagination-post ">
         
-            <a href="/kubernetes-demo/2/">
+            <a href="/kubernetes-demo/3/">
                 
                 <span class="text">Next Page <svg><use xlink:href="#icon-arrow-right"></use></svg></span>
             </a>
@@ -325,11 +347,11 @@ echo "$DEMO_IP:$DEMO_PORT"
 
         <section class="share">
     <h3>Share</h3>
-    <a aria-label="Share on Twitter" href="https://twitter.com/intent/tweet?text=&quot;My notes for demo of kubernetes features made in july 2017 for devs in my company.  I made it for people who didn't know what container and kubernetes are.  I tried to encourage them to start their adventure with kubernets.&quot;%20https://rebyrg.github.io/kubernetes-demo/%20via%20&#64;&hashtags=kubernetes,blog,java,"
+    <a aria-label="Share on Twitter" href="https://twitter.com/intent/tweet?text=&quot;My notes for demo of kubernetes features made in july 2017 for devs in my company.  I made it for people who didn't know what container and kubernetes are.  I tried to encourage them to start their adventure with kubernets.&quot;%20https://rebyrg.github.io/kubernetes-demo/2/%20via%20&#64;&hashtags=kubernetes,blog,java,"
     onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;" title="Share on Twitter">
         <svg class="icon icon-twitter"><use xlink:href="#icon-twitter"></use></svg>
     </a>
-    <a aria-label="Share on Facebook"href="https://www.facebook.com/sharer/sharer.php?u=https://rebyrg.github.io/kubernetes-demo/"
+    <a aria-label="Share on Facebook"href="https://www.facebook.com/sharer/sharer.php?u=https://rebyrg.github.io/kubernetes-demo/2/"
     onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;" title="Share on Facebook">
         <svg class="icon icon-facebook"><use xlink:href="#icon-facebook"></use></svg>
     </a>
@@ -401,7 +423,7 @@ echo "$DEMO_IP:$DEMO_PORT"
         disqus_loaded = true;
         var disqus_shortname = 'rebyrg';
         var disqus_title = '';
-        var disqus_url = '/kubernetes-demo/';
+        var disqus_url = '/kubernetes-demo/2/';
         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
         dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
@@ -564,67 +586,89 @@ echo "$DEMO_IP:$DEMO_PORT"
             "headline": "Demo of basic kubernetes features made for a dev team.",
             "description": "My notes for demo of kubernetes features made in july 2017 for devs in my company.  I made it for people who didn't know what container and kubernetes are.  I tried to encourage them to start their adventure with kubernets.",
             "image": "https://stackify.com/wp-content/uploads/2018/03/quick-guide-to-kubernetes-1-881x441.png",
-            "url": "https://rebyrg.github.io/kubernetes-demo/",
-            "articleBody": "Intro
-
-My notes for demo of kubernetes features made in july 2017 for devs in my company.
-I made it for people who didn’t know what container and kubernetes are.
-I tried to encourage them to start their adventure with kubernets.
-Source code is available here: https://github.com/Rebyrg/k8s-demo
-
-Application
-
-It is a very simple spring boot application created for demonstration of basic kubernetes features.
-It also shows basic principles of creating spring boot applications which are deployed on a kubernetes cluster.
-
-The application exposes only one simple service /rate on spring boot http port (default 8080).
-The rate service returns a rate for a pair of currencies, e.g. it returns 1.0 value for EUR/USD. 
-The rate service works in two modes, each created for a different purpose.
+            "url": "https://rebyrg.github.io/kubernetes-demo/2/",
+            "articleBody": "
+Demonstration scenario
+Prerequirements
 
 
-  Checking if application is serving proper output
+  Before you begin ensure that you have installed on your PC:
+    
+      Java SDK 1.8
+      maven
+      Docker
+      kubectl
+      minikube
+    
+  
+  Configure minikube - add heapster addon and connect its docker demon:
+    minikube addons enable heapster
+minikube start
+eval $(minikube docker-env)
+    
+  
+  Build the application and the docker image:
+    mvn clean package
+docker build -t k8s-demo-currency-provider:0.0.1 .
+    
+    You don’t have to push docker image to a registry thanks to using eval $(minikube docker-env) 
+and imagePullPolicy set to IfNotPresent in all examples below.
+  
 
 
-When service is executed with EUR/USD pair it returns a constant value defined in attribute eurUsdRate 
-of CurrencyProviderRest class.
-It is normal, fast operation with low latency. 
-It always returns the same value until you change the constant in sources and build a new version of the application.
+Notice
 
+If the demonstration is on a real kubernetes cluster connected to private registry you should modify command above and run
+docker build -t registry.example.com/k8s-demo-currency-provider:0.0.1 .
 
-  Emulating high CPU load operation
+change registry.example.com to your registry address. You should also modify kubernetes yaml descriptors in 
+k8s directory adding registry prefix in image property of deployments. Also every command operating on image below should be customized. You should also execute docker push registry.example.com/k8s-demo-currency-provider:0.0.1 after docker build -t registry.example.com/k8s-demo-currency-provider:0.0.1 . command (for application version 0.0.1 as well as 0.0.2 changing registry.example.com/k8s-demo-currency-provider:0.0.1 to registry.example.com/k8s-demo-currency-provider:0.0.2).
 
+Deployment of sample spring boot application
 
-Executing service with any other then EUR/USD values, e.g. PLN/EUR, causes special rate wizzard feature will be used. The feature is implemented 
-in rateWizzard method of CurrencyProviderRest class. 
-The rateWizzard method uses same mathematics magic that consumes a lot of CPU ;-). 
-Its CPU load and latency depends on value of environment variable WIZARD_LOOPS passed to the application. The variable WIZARD_LOOPS takes numbers as values. Setting it to 10000000 results approximately 1 second latency (running on Lenovo IdeaPad 710s laptop with i7 7500U CPU).
-
-There is also parameter set by environment variable SPREAD that causes the rate is multiplied by 1 + its value. 
-So when the variable SPREADis set to 0.003 it will result the rate for EUR/USD is 1.003 instead of 1.0.
-
-The application uses spring boot actuator /health endpoint to provide health checks.
-
-Usage:
-
-http:&amp;lt;host&amp;gt;:&amp;lt;port&amp;gt;/rate?source=A&amp;amp;destination=B gets rate for currency A/B, e.g. get the rate of currency pair 
-EUR/USD by executing http://localhost:8080/rate?source=EUR&amp;amp;destination=USD
-Build:
-
-Command mvn clean package creates jar file target/k8s-demo-currency-provider-0.0.1-SNAPSHOT.jar.
-Command docker build -t k8s-demo-currency-provider:0.0.1 .  builds docker image k8s-demo-currency-provider and tag it with version 0.0.1.
-Deployment:
-
+This is demonstration of most basic kubernetes features. Deploy the application on your kubernetes. 
+Tell kubernetes to do this by creating ConfigMap with application configuration and deployment:
 kubectl create -f k8s/k8s-demo-currency.configmap.yaml
 kubectl create -f k8s/k8s-demo-currency-provider.deployment.yaml
+
+Kubernetes allocates all necessary resources for the application and then creates a pod with the application as described 
+in deployment and uses configuration provided in the ConfigMap.
+You can see what happens on the kubernetes dashboard in a browser by executing minikube dashboard or in terminal kubectl get pods. 
+You should find newly created, running pod. You can check its logs in the dashboard or by executing kubectl logs &amp;lt;pod aname&amp;gt;
+You can also see CPU and memory loads of a pod on the dashboard.
+Application configuration is stored in ConfigMap k8s-demo-currency. You can check its content in the dashboard or by executing kubectl get configmap -o yaml.
+Execute kubectl exec &amp;lt;pod name&amp;gt; env and find the SPREAD environment variable.
+Change spread value in the k8s-demo-currency ConfigMap in the dahsboard.
+Again execute kubectl exec &amp;lt;pod name&amp;gt; env and find the SPREAD environment variable.
+Notice that when you change values in a ConfigMap, the deployment using them will not be notified automatically. 
+You have to manually force restart of the pods managed by deployment. 
+You can do it by deleting pods - kubernetes will create new instances with fresh configuration loaded from changed ConfigMap. Run kubectl delete &amp;lt;pod aname&amp;gt; or go inside pod by executing kubectl exec -it &amp;lt;pod aname&amp;gt; /bin/sh and than from the shell of the container kill the java process.
+In the real world to avoid manual restarts you can use tools like helm with charts or consider using immutable ConfigMaps (do not modify ConfigMap when you need to change its value, create a new one and repleace usage of the old one to the newly created). 
+You can not access the application http endpoint. You must create a kubernetes service what is subject of next section.
+
+Expose deployment on kubernetes service
+
+When the pods where created, they are not accessible from outside of the cluster. 
+They are not even accessible for other pods in the same namespace of kubernetes.
+You have to create a service to expose pods ports. It will also provide load balancing of network traffic to our application. 
+By choosing the service type of NodePort you can access it from outside of the cluster.
+Below command creates service of type NodePort on kubernetes for k8s-demo-currency-provider pods:
 kubectl create -f k8s/k8s-demo-currency-provider.service.yaml
 
-You can obtain service url running
+It exposes pod’s port 8080 on random generated port for outside access. 
+You can launch a browser with url of created service by executing:
+minikube service k8s-demo-currency-provider
+
+It will launch browser with correct url containing ip host of minikube and port assigned by kubernetes to k8s-demo-currency-provider service.
+Add suffix /rate?source=EUR&amp;amp;destination=USD in the url in browser and ensure that application is running and its response is correct.
+You can also obtain external service url as described in Deployment section above.
 export DEMO_IP=$(kubectl get nodes -o jsonpath=&quot;{.items[0].status.addresses[0].address}&quot;)
 export DEMO_PORT=$(kubectl get services k8s-demo-currency-provider -o jsonpath=&quot;{.spec.ports[0].nodePort}&quot;)
-echo &quot;$DEMO_IP:$DEMO_PORT&quot;
+curl &quot;$DEMO_IP:$DEMO_PORT/rate?source=EUR&amp;amp;destination=USD&quot;
 
+You can replay test of changing configuration from previous scenario and check application response after changed configuration and then pod restarted.
 ",
-            "wordcount": "435",
+            "wordcount": "758",
             "inLanguage": "en",
             "dateCreated": "2017-07-16/",
             "datePublished": "2017-07-16/",

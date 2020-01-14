@@ -154,6 +154,34 @@
             <lastmod>2017-07-16</lastmod>
         </url>
     
+        <url>
+            <loc>https://rebyrg.github.io/kubernetes-demo/2/</loc>
+            <changefreq>weekly</changefreq>
+            <priority>0.8</priority>
+            <lastmod>2017-07-16</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://rebyrg.github.io/kubernetes-demo/3/</loc>
+            <changefreq>weekly</changefreq>
+            <priority>0.8</priority>
+            <lastmod>2017-07-16</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://rebyrg.github.io/kubernetes-demo/4/</loc>
+            <changefreq>weekly</changefreq>
+            <priority>0.8</priority>
+            <lastmod>2017-07-16</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://rebyrg.github.io/kubernetes-demo/view-all/</loc>
+            <changefreq>weekly</changefreq>
+            <priority>0.8</priority>
+            <lastmod>2017-07-16</lastmod>
+        </url>
+    
     
         <url>
             <loc>https://rebyrg.github.io/authors/rebyrg/</loc>

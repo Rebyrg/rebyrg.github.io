@@ -5,8 +5,8 @@
     <description>Dev site of DevOps blog by Rebyrg.</description>
     <link>https://rebyrg.github.io/</link>
     <atom:link href="https://rebyrg.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 14 Jan 2020 20:14:14 +0100</pubDate>
-    <lastBuildDate>Tue, 14 Jan 2020 20:14:14 +0100</lastBuildDate>
+    <pubDate>Tue, 14 Jan 2020 20:41:28 +0100</pubDate>
+    <lastBuildDate>Tue, 14 Jan 2020 20:41:28 +0100</lastBuildDate>
     <generator>Jekyll v3.8.6</generator>
     
       <item>
@@ -15,6 +15,70 @@
         <pubDate>Sun, 16 Jul 2017 01:48:05 +0200</pubDate>
         <link>https://rebyrg.github.io/kubernetes-demo/</link>
         <guid isPermaLink="true">https://rebyrg.github.io/kubernetes-demo/</guid>
+        
+        <category>kubernetes</category>
+        
+        <category>blog</category>
+        
+        <category>java</category>
+        
+        <category>kubernetes</category>
+      </item>
+    
+      <item>
+        <title>Kubernetes demo</title>
+        <description>&lt;h1 id=&quot;demonstration-scenario&quot;&gt;Demonstration scenario&lt;/h1&gt; &lt;h2 id=&quot;prerequirements&quot;&gt;Prerequirements&lt;/h2&gt; &lt;ol&gt; &lt;li&gt;Before you begin ensure that you have installed on your PC: &lt;ul&gt; &lt;li&gt;Java SDK 1.8&lt;/li&gt; &lt;li&gt;maven&lt;/li&gt; &lt;li&gt;Docker&lt;/li&gt; &lt;li&gt;kubectl&lt;/li&gt; &lt;li&gt;&lt;a href=&quot;https://github.com/kubernetes/minikube&quot;&gt;minikube&lt;/a&gt;&lt;/li&gt; &lt;/ul&gt; &lt;/li&gt; &lt;li&gt;Configure minikube - add heapster addon and connect its docker demon: &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;minikube addons enable heapster minikube start eval $(minikube docker-env) &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt; &lt;/div&gt; &lt;/li&gt; &lt;li&gt;Build the application and the docker image: &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mvn clean package docker build -t k8s-demo-currency-provider:0.0.1 . &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt; &lt;/div&gt; &lt;p&gt;You don’t have to push docker image to a registry thanks to using &lt;code class=&quot;highlighter-rouge&quot;&gt;eval $(minikube docker-env)&lt;/code&gt; and imagePullPolicy set to IfNotPresent in all examples below.&lt;/p&gt;...</description>
+        <pubDate>Sun, 16 Jul 2017 01:48:05 +0200</pubDate>
+        <link>https://rebyrg.github.io/kubernetes-demo/2/</link>
+        <guid isPermaLink="true">https://rebyrg.github.io/kubernetes-demo/2/</guid>
+        
+        <category>kubernetes</category>
+        
+        <category>blog</category>
+        
+        <category>java</category>
+        
+        <category>kubernetes</category>
+      </item>
+    
+      <item>
+        <title>Kubernetes demo</title>
+        <description>&lt;h2 id=&quot;scale-the-application&quot;&gt;Scale the application&lt;/h2&gt; &lt;h4 id=&quot;availlability-and-response-test&quot;&gt;Availlability and response test&lt;/h4&gt; &lt;p&gt;Test described below will be used also in further sections for demonstration various features of kubernetes. In the new terminal execute below script.&lt;/p&gt; &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;export DEMO_IP=$(kubectl get nodes -o jsonpath=&quot;{.items[0].status.addresses[0].address}&quot;) export DEMO_PORT=$(kubectl get services k8s-demo-currency-provider -o jsonpath=&quot;{.spec.ports[0].nodePort}&quot;) while true; do sleep 1; curl --max-time 1 &quot;$DEMO_IP:$DEMO_PORT/rate?source=EUR&amp;amp;destination=USD&quot;; echo -e ' -&amp;gt; '$(date); done &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt; &lt;p&gt;It will call our service and prints ones a second result in the terminal. Script checks whether application is available by printing content of the rate service. The curl command waits only 1 second for an...</description>
+        <pubDate>Sun, 16 Jul 2017 01:48:05 +0200</pubDate>
+        <link>https://rebyrg.github.io/kubernetes-demo/3/</link>
+        <guid isPermaLink="true">https://rebyrg.github.io/kubernetes-demo/3/</guid>
+        
+        <category>kubernetes</category>
+        
+        <category>blog</category>
+        
+        <category>java</category>
+        
+        <category>kubernetes</category>
+      </item>
+    
+      <item>
+        <title>Kubernetes demo</title>
+        <description>&lt;h2 id=&quot;horizontal-pod-autoscaling-hpa&quot;&gt;Horizontal pod autoscaling - HPA&lt;/h2&gt; &lt;p&gt;HPA needs resources to be configured in the deployment descriptor for running. Edit k8s-demo-currency-provider deployment and add resources configuration. Run &lt;code class=&quot;highlighter-rouge&quot;&gt;kubectl edit deployment k8s-demo-currency-provider&lt;/code&gt; and in the editor place below text in container section:&lt;/p&gt; &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; resources: limits: cpu: 500m memory: 300Mi requests: cpu: 250m memory: 200Mi &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt; &lt;p&gt;File &lt;code class=&quot;highlighter-rouge&quot;&gt;k8s/k8s-demo-currency-provider.health.resources.yaml&lt;/code&gt; already contains above modifications. So you can use &lt;code class=&quot;highlighter-rouge&quot;&gt;kubectl apply -f k8s/k8s-demo-currency-provider.health.resources.yaml&lt;/code&gt; instead. Run &lt;code class=&quot;highlighter-rouge&quot;&gt;kubectl autoscale deployment k8s-demo-currency-provider --min=2 --max=5 --cpu-percent=80&lt;/code&gt;. It enables HPA for our deployment with constraints for count of pods. Minimum is set to 2...</description>
+        <pubDate>Sun, 16 Jul 2017 01:48:05 +0200</pubDate>
+        <link>https://rebyrg.github.io/kubernetes-demo/4/</link>
+        <guid isPermaLink="true">https://rebyrg.github.io/kubernetes-demo/4/</guid>
+        
+        <category>kubernetes</category>
+        
+        <category>blog</category>
+        
+        <category>java</category>
+        
+        <category>kubernetes</category>
+      </item>
+    
+      <item>
+        <title>Kubernetes demo</title>
+        <description>&lt;h1 id=&quot;intro&quot;&gt;Intro&lt;/h1&gt; &lt;p&gt;My notes for demo of kubernetes features made in july 2017 for devs in my company. I made it for people who didn’t know what container and kubernetes are. I tried to encourage them to start their adventure with kubernets. Source code is available here: &lt;a href=&quot;https://github.com/Rebyrg/k8s-demo&quot;&gt;https://github.com/Rebyrg/k8s-demo&lt;/a&gt;&lt;/p&gt; &lt;h1 id=&quot;application&quot;&gt;Application&lt;/h1&gt; &lt;p&gt;It is a very simple spring boot application created for demonstration of basic kubernetes features. It also shows basic principles of creating spring boot applications which are deployed on a kubernetes cluster.&lt;/p&gt; &lt;p&gt;The application exposes only one simple service &lt;code class=&quot;highlighter-rouge&quot;&gt;/rate&lt;/code&gt; on spring boot http port (default 8080). The...</description>
+        <pubDate>Sun, 16 Jul 2017 01:48:05 +0200</pubDate>
+        <link>https://rebyrg.github.io/kubernetes-demo/view-all/</link>
+        <guid isPermaLink="true">https://rebyrg.github.io/kubernetes-demo/view-all/</guid>
         
         <category>kubernetes</category>
         

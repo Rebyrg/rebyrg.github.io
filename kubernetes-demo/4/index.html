@@ -189,7 +189,7 @@ July 16, 2017
                         </time>
                     
                     <svg id="clock" class="icon-clock"><use xlink:href="#icon-clock"></use></svg>
-                    <span>2 min to read</span>
+                    <span>3 min to read</span>
                 </p>
                 <h1 class="post-title">Kubernetes demo</h1>
                 <p class="post-subtitle">Demo of basic kubernetes features made for a dev team.</p>
@@ -201,89 +201,86 @@ July 16, 2017
     
     <div class="pagination pagination-post ">
         
-            <a href="/kubernetes-demo/2/">
+            <a href="">
                 
                     
-    <div class="progress-bar ">
+    <div class="progress-bar finished">
         
             <div class="bar completed"></div>
         
-            <div class="bar "></div>
+            <div class="bar completed"></div>
         
-            <div class="bar "></div>
+            <div class="bar completed"></div>
         
-            <div class="bar "></div>
+            <div class="bar completed"></div>
         
         <img class="star" src="/assets/img/star.svg">
     </div>
 
 
                 
-                <span class="text">Next Page <svg><use xlink:href="#icon-arrow-right"></use></svg></span>
+                <span class="text">Next Post <svg><use xlink:href="#icon-arrow-right"></use></svg></span>
             </a>
         
     </div>
 
 
 
-                <h1 id="intro">Intro</h1>
+                
+<h2 id="horizontal-pod-autoscaling-hpa">Horizontal pod autoscaling - HPA</h2>
 
-<p>My notes for demo of kubernetes features made in july 2017 for devs in my company.
-I made it for people who didn’t know what container and kubernetes are.
-I tried to encourage them to start their adventure with kubernets.
-Source code is available here: <a href="https://github.com/Rebyrg/k8s-demo">https://github.com/Rebyrg/k8s-demo</a></p>
-
-<h1 id="application">Application</h1>
-
-<p>It is a very simple spring boot application created for demonstration of basic kubernetes features.
-It also shows basic principles of creating spring boot applications which are deployed on a kubernetes cluster.</p>
-
-<p>The application exposes only one simple service <code class="highlighter-rouge">/rate</code> on spring boot http port (default 8080).
-The rate service returns a rate for a pair of currencies, e.g. it returns 1.0 value for EUR/USD. 
-The rate service works in two modes, each created for a different purpose.</p>
-
-<ol>
-  <li>Checking if application is serving proper output</li>
-</ol>
-
-<p>When service is executed with EUR/USD pair it returns a constant value defined in attribute <code class="highlighter-rouge">eurUsdRate</code> 
-of <code class="highlighter-rouge">CurrencyProviderRest</code> class.
-It is normal, fast operation with low latency. 
-It always returns the same value until you change the constant in sources and build a new version of the application.</p>
-
-<ol>
-  <li>Emulating high CPU load operation</li>
-</ol>
-
-<p>Executing service with any other then EUR/USD values, e.g. PLN/EUR, causes special <strong>rate wizzard</strong> feature will be used. The feature is implemented 
-in <code class="highlighter-rouge">rateWizzard</code> method of <code class="highlighter-rouge">CurrencyProviderRest</code> class. 
-The <code class="highlighter-rouge">rateWizzard</code> method uses same mathematics magic that consumes a lot of CPU ;-). 
-Its CPU load and latency depends on value of environment variable <code class="highlighter-rouge">WIZARD_LOOPS</code> passed to the application. The variable <code class="highlighter-rouge">WIZARD_LOOPS</code> takes numbers as values. Setting it to <code class="highlighter-rouge">10000000</code> results approximately 1 second latency (running on Lenovo IdeaPad 710s laptop with i7 7500U CPU).</p>
-
-<p>There is also parameter set by environment variable <code class="highlighter-rouge">SPREAD</code> that causes the rate is multiplied by 1 + its value. 
-So when the variable <code class="highlighter-rouge">SPREAD</code>is set to 0.003 it will result the rate for EUR/USD is 1.003 instead of 1.0.</p>
-
-<p>The application uses spring boot actuator /health endpoint to provide health checks.</p>
-
-<h6 id="usage-">Usage:</h6>
-
-<p><code class="highlighter-rouge">http:&lt;host&gt;:&lt;port&gt;/rate?source=A&amp;destination=B</code> gets rate for currency A/B, e.g. get the rate of currency pair 
-EUR/USD by executing <code class="highlighter-rouge">http://localhost:8080/rate?source=EUR&amp;destination=USD</code></p>
-<h6 id="build">Build:</h6>
-
-<p>Command <code class="highlighter-rouge">mvn clean package</code> creates jar file <code class="highlighter-rouge">target/k8s-demo-currency-provider-0.0.1-SNAPSHOT.jar</code>.
-Command <code class="highlighter-rouge">docker build -t k8s-demo-currency-provider:0.0.1 .</code>  builds docker image <code class="highlighter-rouge">k8s-demo-currency-provider</code> and tag it with version <code class="highlighter-rouge">0.0.1</code>.</p>
-<h6 id="deployment">Deployment:</h6>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create -f k8s/k8s-demo-currency.configmap.yaml
-kubectl create -f k8s/k8s-demo-currency-provider.deployment.yaml
-kubectl create -f k8s/k8s-demo-currency-provider.service.yaml
+<p>HPA needs resources to be configured in the deployment descriptor for running. 
+Edit k8s-demo-currency-provider deployment and add resources configuration.
+Run <code class="highlighter-rouge">kubectl edit deployment k8s-demo-currency-provider</code> and in the editor place below text in container section:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        resources:
+          limits:
+            cpu: 500m
+            memory: 300Mi
+          requests:
+            cpu: 250m
+            memory: 200Mi
 </code></pre></div></div>
-<p>You can obtain service url running</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>export DEMO_IP=$(kubectl get nodes -o jsonpath="{.items[0].status.addresses[0].address}")
-export DEMO_PORT=$(kubectl get services k8s-demo-currency-provider -o jsonpath="{.spec.ports[0].nodePort}")
-echo "$DEMO_IP:$DEMO_PORT"
+<p>File <code class="highlighter-rouge">k8s/k8s-demo-currency-provider.health.resources.yaml</code> already contains above modifications. 
+So you can use <code class="highlighter-rouge">kubectl apply -f k8s/k8s-demo-currency-provider.health.resources.yaml</code> instead.
+Run <code class="highlighter-rouge">kubectl autoscale deployment k8s-demo-currency-provider --min=2 --max=5 --cpu-percent=80</code>. 
+It enables HPA for our deployment with constraints for count of pods. Minimum is set to 2 and maximum to 5. 
+HPA uses CPU statistic provided by heapser. The parameter –cpu-percent tells HPA when it should scale the application horizontally.
+You can check status of HPA executing <code class="highlighter-rouge">kubectl get hpa</code> and <code class="highlighter-rouge">kubectl describe hpa</code>. 
+We need to cause high CPU load for demonstration of HPA. 
+We will use the rate service with <strong>rateWizzard</strong> of our application.
+Run a few times in a short delays the <code class="highlighter-rouge">/rate</code> endpoint with currencies different when EUR/USD eg. PLN/USD.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl "$DEMO_IP:$DEMO_PORT/rate?source=PLN&amp;destination=USD"
 </code></pre></div></div>
+<p>Now you can check how HPA works by executing command <code class="highlighter-rouge">kubectl describe hpa</code>.
+The <strong>rateWizzard</strong>  should increase the CPU load. 
+Notice that there is delay in gathering CPU statistics introduced by heapster and HPA itself. 
+So wait a minute until HPA gathers statistics and start works.</p>
+
+<p>HPA reads heapster statistics and calculates desired pods count.
+It cares about pods count adequate to CPU load, resources configuration in deployment and HPA parameters. 
+Here is part of output of command <code class="highlighter-rouge">kubectl describe hpa</code> that contains logs of 15 minutes working HPA:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  FirstSeen    LastSeen   Count  From            SubObjectPath  Type      Reason       Message
+  ---------    --------   -----  ----            -------------  --------   ------       -------
+  14m     13m       3  {horizontal-pod-autoscaler }         Normal    MetricsNotAvailableYet unable to get metrics for resource cpu: no metrics returned from heapster
+  13m     12m       3  {horizontal-pod-autoscaler }         Normal    DesiredReplicasComputed    Computed the desired num of replicas: 1 (avgCPUutil: 22, current replicas: 2)
+  12m     11m       3  {horizontal-pod-autoscaler }         Normal    DesiredReplicasComputed    Computed the desired num of replicas: 1 (avgCPUutil: 5, current replicas: 2)
+  10m     10m       1  {horizontal-pod-autoscaler }         Normal    DesiredReplicasComputed    Computed the desired num of replicas: 3 (avgCPUutil: 94, current replicas: 2)
+  10m     10m       1  {horizontal-pod-autoscaler }         Normal    SuccessfulRescale  New size: 3; reason: CPU utilization above target
+  7m      6m    3  {horizontal-pod-autoscaler }         Normal    DesiredReplicasComputed    Computed the desired num of replicas: 4 (avgCPUutil: 102, current replicas: 3)
+  6m      6m    2  {horizontal-pod-autoscaler }         Normal    DesiredReplicasComputed    Computed the desired num of replicas: 5 (avgCPUutil: 131, current replicas: 3)
+  6m      6m    1  {horizontal-pod-autoscaler }         Normal    SuccessfulRescale  New size: 5; reason: CPU utilization above target
+  4m      3m    3  {horizontal-pod-autoscaler }         Normal    DesiredReplicasComputed    Computed the desired num of replicas: 4 (avgCPUutil: 51, current replicas: 5)
+  3m      2m    3  {horizontal-pod-autoscaler }         Normal    DesiredReplicasComputed    Computed the desired num of replicas: 3 (avgCPUutil: 43, current replicas: 5)
+  2m      1m    3  {horizontal-pod-autoscaler }         Normal    DesiredReplicasComputed    Computed the desired num of replicas: 3 (avgCPUutil: 44, current replicas: 5)
+  1m      41s       3  {horizontal-pod-autoscaler }         Normal    DesiredReplicasComputed    Computed the desired num of replicas: 1 (avgCPUutil: 16, current replicas: 5)
+  11s     11s       1  {horizontal-pod-autoscaler }         Normal    DesiredReplicasComputed    (events with common reason combined)
+  11s     11s       1  {horizontal-pod-autoscaler }         Normal    SuccessfulRescale  New size: 2; reason: All metrics below target
+  11s     11s       2  {horizontal-pod-autoscaler }         Normal    DesiredReplicasComputed    Computed the desired num of replicas: 1 (avgCPUutil: 4, current replicas: 5)
+</code></pre></div></div>
+<p>As you can see HPA created 3-rd pod when it noticed that CPU load was to high. 
+After a few minutes, when CPU load decreased, HPA scaled it down to minimum count of 2 pods.
+If during your test HPA did not created a new pod, probably you should increase CPU loads by running additional <code class="highlighter-rouge">/rate</code> with <strong>rateWizzard</strong>  endpoint.
+You can also check ConfigMap and set <strong>wizardLoops</strong> to a higher value.</p>
 
 
                 <!-- Pagination links -->
@@ -291,9 +288,9 @@ echo "$DEMO_IP:$DEMO_PORT"
     
     <div class="pagination pagination-post ">
         
-            <a href="/kubernetes-demo/2/">
+            <a href="">
                 
-                <span class="text">Next Page <svg><use xlink:href="#icon-arrow-right"></use></svg></span>
+                <span class="text">Next Post <svg><use xlink:href="#icon-arrow-right"></use></svg></span>
             </a>
         
     </div>
@@ -319,17 +316,38 @@ echo "$DEMO_IP:$DEMO_PORT"
 
         <!-- Show modal if the post is the last one -->
         
+            <div class="modal">
+    <div class="window">
+        <svg class="close">
+            <use xlink:href="#icon-close"></use>
+        </svg>
+        <div class="header">
+            <h2>You made it!</h2>
+            <p>Why don't you try another?</p>
+        </div>
+        <div class="content">
+            <ul>
+                
+                
+                
+            </ul>
+        </div>
+    </div>
+    <div class="mask"></div>
+</div>
+
+        
 
         <!-- Show modal before user leaves the page -->
         
 
         <section class="share">
     <h3>Share</h3>
-    <a aria-label="Share on Twitter" href="https://twitter.com/intent/tweet?text=&quot;My notes for demo of kubernetes features made in july 2017 for devs in my company.  I made it for people who didn't know what container and kubernetes are.  I tried to encourage them to start their adventure with kubernets.&quot;%20https://rebyrg.github.io/kubernetes-demo/%20via%20&#64;&hashtags=kubernetes,blog,java,"
+    <a aria-label="Share on Twitter" href="https://twitter.com/intent/tweet?text=&quot;My notes for demo of kubernetes features made in july 2017 for devs in my company.  I made it for people who didn't know what container and kubernetes are.  I tried to encourage them to start their adventure with kubernets.&quot;%20https://rebyrg.github.io/kubernetes-demo/4/%20via%20&#64;&hashtags=kubernetes,blog,java,"
     onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;" title="Share on Twitter">
         <svg class="icon icon-twitter"><use xlink:href="#icon-twitter"></use></svg>
     </a>
-    <a aria-label="Share on Facebook"href="https://www.facebook.com/sharer/sharer.php?u=https://rebyrg.github.io/kubernetes-demo/"
+    <a aria-label="Share on Facebook"href="https://www.facebook.com/sharer/sharer.php?u=https://rebyrg.github.io/kubernetes-demo/4/"
     onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;" title="Share on Facebook">
         <svg class="icon icon-facebook"><use xlink:href="#icon-facebook"></use></svg>
     </a>
@@ -401,7 +419,7 @@ echo "$DEMO_IP:$DEMO_PORT"
         disqus_loaded = true;
         var disqus_shortname = 'rebyrg';
         var disqus_title = '';
-        var disqus_url = '/kubernetes-demo/';
+        var disqus_url = '/kubernetes-demo/4/';
         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
         dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
@@ -564,67 +582,64 @@ echo "$DEMO_IP:$DEMO_PORT"
             "headline": "Demo of basic kubernetes features made for a dev team.",
             "description": "My notes for demo of kubernetes features made in july 2017 for devs in my company.  I made it for people who didn't know what container and kubernetes are.  I tried to encourage them to start their adventure with kubernets.",
             "image": "https://stackify.com/wp-content/uploads/2018/03/quick-guide-to-kubernetes-1-881x441.png",
-            "url": "https://rebyrg.github.io/kubernetes-demo/",
-            "articleBody": "Intro
+            "url": "https://rebyrg.github.io/kubernetes-demo/4/",
+            "articleBody": "
+Horizontal pod autoscaling - HPA
 
-My notes for demo of kubernetes features made in july 2017 for devs in my company.
-I made it for people who didn’t know what container and kubernetes are.
-I tried to encourage them to start their adventure with kubernets.
-Source code is available here: https://github.com/Rebyrg/k8s-demo
+HPA needs resources to be configured in the deployment descriptor for running. 
+Edit k8s-demo-currency-provider deployment and add resources configuration.
+Run kubectl edit deployment k8s-demo-currency-provider and in the editor place below text in container section:
+        resources:
+          limits:
+            cpu: 500m
+            memory: 300Mi
+          requests:
+            cpu: 250m
+            memory: 200Mi
 
-Application
+File k8s/k8s-demo-currency-provider.health.resources.yaml already contains above modifications. 
+So you can use kubectl apply -f k8s/k8s-demo-currency-provider.health.resources.yaml instead.
+Run kubectl autoscale deployment k8s-demo-currency-provider --min=2 --max=5 --cpu-percent=80. 
+It enables HPA for our deployment with constraints for count of pods. Minimum is set to 2 and maximum to 5. 
+HPA uses CPU statistic provided by heapser. The parameter –cpu-percent tells HPA when it should scale the application horizontally.
+You can check status of HPA executing kubectl get hpa and kubectl describe hpa. 
+We need to cause high CPU load for demonstration of HPA. 
+We will use the rate service with rateWizzard of our application.
+Run a few times in a short delays the /rate endpoint with currencies different when EUR/USD eg. PLN/USD.
+curl &quot;$DEMO_IP:$DEMO_PORT/rate?source=PLN&amp;amp;destination=USD&quot;
 
-It is a very simple spring boot application created for demonstration of basic kubernetes features.
-It also shows basic principles of creating spring boot applications which are deployed on a kubernetes cluster.
+Now you can check how HPA works by executing command kubectl describe hpa.
+The rateWizzard  should increase the CPU load. 
+Notice that there is delay in gathering CPU statistics introduced by heapster and HPA itself. 
+So wait a minute until HPA gathers statistics and start works.
 
-The application exposes only one simple service /rate on spring boot http port (default 8080).
-The rate service returns a rate for a pair of currencies, e.g. it returns 1.0 value for EUR/USD. 
-The rate service works in two modes, each created for a different purpose.
+HPA reads heapster statistics and calculates desired pods count.
+It cares about pods count adequate to CPU load, resources configuration in deployment and HPA parameters. 
+Here is part of output of command kubectl describe hpa that contains logs of 15 minutes working HPA:
+  FirstSeen    LastSeen   Count  From            SubObjectPath  Type      Reason       Message
+  ---------    --------   -----  ----            -------------  --------   ------       -------
+  14m     13m       3  {horizontal-pod-autoscaler }         Normal    MetricsNotAvailableYet unable to get metrics for resource cpu: no metrics returned from heapster
+  13m     12m       3  {horizontal-pod-autoscaler }         Normal    DesiredReplicasComputed    Computed the desired num of replicas: 1 (avgCPUutil: 22, current replicas: 2)
+  12m     11m       3  {horizontal-pod-autoscaler }         Normal    DesiredReplicasComputed    Computed the desired num of replicas: 1 (avgCPUutil: 5, current replicas: 2)
+  10m     10m       1  {horizontal-pod-autoscaler }         Normal    DesiredReplicasComputed    Computed the desired num of replicas: 3 (avgCPUutil: 94, current replicas: 2)
+  10m     10m       1  {horizontal-pod-autoscaler }         Normal    SuccessfulRescale  New size: 3; reason: CPU utilization above target
+  7m      6m    3  {horizontal-pod-autoscaler }         Normal    DesiredReplicasComputed    Computed the desired num of replicas: 4 (avgCPUutil: 102, current replicas: 3)
+  6m      6m    2  {horizontal-pod-autoscaler }         Normal    DesiredReplicasComputed    Computed the desired num of replicas: 5 (avgCPUutil: 131, current replicas: 3)
+  6m      6m    1  {horizontal-pod-autoscaler }         Normal    SuccessfulRescale  New size: 5; reason: CPU utilization above target
+  4m      3m    3  {horizontal-pod-autoscaler }         Normal    DesiredReplicasComputed    Computed the desired num of replicas: 4 (avgCPUutil: 51, current replicas: 5)
+  3m      2m    3  {horizontal-pod-autoscaler }         Normal    DesiredReplicasComputed    Computed the desired num of replicas: 3 (avgCPUutil: 43, current replicas: 5)
+  2m      1m    3  {horizontal-pod-autoscaler }         Normal    DesiredReplicasComputed    Computed the desired num of replicas: 3 (avgCPUutil: 44, current replicas: 5)
+  1m      41s       3  {horizontal-pod-autoscaler }         Normal    DesiredReplicasComputed    Computed the desired num of replicas: 1 (avgCPUutil: 16, current replicas: 5)
+  11s     11s       1  {horizontal-pod-autoscaler }         Normal    DesiredReplicasComputed    (events with common reason combined)
+  11s     11s       1  {horizontal-pod-autoscaler }         Normal    SuccessfulRescale  New size: 2; reason: All metrics below target
+  11s     11s       2  {horizontal-pod-autoscaler }         Normal    DesiredReplicasComputed    Computed the desired num of replicas: 1 (avgCPUutil: 4, current replicas: 5)
 
-
-  Checking if application is serving proper output
-
-
-When service is executed with EUR/USD pair it returns a constant value defined in attribute eurUsdRate 
-of CurrencyProviderRest class.
-It is normal, fast operation with low latency. 
-It always returns the same value until you change the constant in sources and build a new version of the application.
-
-
-  Emulating high CPU load operation
-
-
-Executing service with any other then EUR/USD values, e.g. PLN/EUR, causes special rate wizzard feature will be used. The feature is implemented 
-in rateWizzard method of CurrencyProviderRest class. 
-The rateWizzard method uses same mathematics magic that consumes a lot of CPU ;-). 
-Its CPU load and latency depends on value of environment variable WIZARD_LOOPS passed to the application. The variable WIZARD_LOOPS takes numbers as values. Setting it to 10000000 results approximately 1 second latency (running on Lenovo IdeaPad 710s laptop with i7 7500U CPU).
-
-There is also parameter set by environment variable SPREAD that causes the rate is multiplied by 1 + its value. 
-So when the variable SPREADis set to 0.003 it will result the rate for EUR/USD is 1.003 instead of 1.0.
-
-The application uses spring boot actuator /health endpoint to provide health checks.
-
-Usage:
-
-http:&amp;lt;host&amp;gt;:&amp;lt;port&amp;gt;/rate?source=A&amp;amp;destination=B gets rate for currency A/B, e.g. get the rate of currency pair 
-EUR/USD by executing http://localhost:8080/rate?source=EUR&amp;amp;destination=USD
-Build:
-
-Command mvn clean package creates jar file target/k8s-demo-currency-provider-0.0.1-SNAPSHOT.jar.
-Command docker build -t k8s-demo-currency-provider:0.0.1 .  builds docker image k8s-demo-currency-provider and tag it with version 0.0.1.
-Deployment:
-
-kubectl create -f k8s/k8s-demo-currency.configmap.yaml
-kubectl create -f k8s/k8s-demo-currency-provider.deployment.yaml
-kubectl create -f k8s/k8s-demo-currency-provider.service.yaml
-
-You can obtain service url running
-export DEMO_IP=$(kubectl get nodes -o jsonpath=&quot;{.items[0].status.addresses[0].address}&quot;)
-export DEMO_PORT=$(kubectl get services k8s-demo-currency-provider -o jsonpath=&quot;{.spec.ports[0].nodePort}&quot;)
-echo &quot;$DEMO_IP:$DEMO_PORT&quot;
-
+As you can see HPA created 3-rd pod when it noticed that CPU load was to high. 
+After a few minutes, when CPU load decreased, HPA scaled it down to minimum count of 2 pods.
+If during your test HPA did not created a new pod, probably you should increase CPU loads by running additional /rate with rateWizzard  endpoint.
+You can also check ConfigMap and set wizardLoops to a higher value.
 ",
-            "wordcount": "435",
+            "wordcount": "636",
             "inLanguage": "en",
             "dateCreated": "2017-07-16/",
             "datePublished": "2017-07-16/",
