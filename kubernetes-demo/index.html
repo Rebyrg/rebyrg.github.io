@@ -226,12 +226,10 @@ July 16, 2017
 
 
 
-                <h1 id="intro">Intro</h1>
-
-<p>My notes for demo of kubernetes features made in july 2017 for devs in my company.
-I made it for people who didn’t know what container and kubernetes are.
+                <p>My notes made to demonstrate kubernetes features. The demo was in July 2017 for develelopers in company I work for.
+I did it for people who didn’t know what container and kubernetes are.
 I tried to encourage them to start their adventure with kubernets.
-Source code is available here: <a href="https://github.com/Rebyrg/k8s-demo">https://github.com/Rebyrg/k8s-demo</a></p>
+Source code: <a href="https://github.com/Rebyrg/k8s-demo">https://github.com/Rebyrg/k8s-demo</a></p>
 
 <h1 id="application">Application</h1>
 
@@ -242,14 +240,14 @@ It also shows basic principles of creating spring boot applications which are de
 The rate service returns a rate for a pair of currencies, e.g. it returns 1.0 value for EUR/USD. 
 The rate service works in two modes, each created for a different purpose.</p>
 
-<h2 id="1-checking-if-application-is-serving-proper-output">1. Checking if application is serving proper output</h2>
+<h4 id="1-checking-if-application-is-serving-proper-output">1. Checking if application is serving proper output</h4>
 
 <p>When service is executed with EUR/USD pair it returns a constant value defined in attribute <code class="highlighter-rouge">eurUsdRate</code> 
 of <code class="highlighter-rouge">CurrencyProviderRest</code> class.
 It is normal, fast operation with low latency. 
 It always returns the same value until you change the constant in sources and build a new version of the application.</p>
 
-<h2 id="2-emulating-high-cpu-load-operation">2. Emulating high CPU load operation</h2>
+<h4 id="2-emulating-high-cpu-load-operation">2. Emulating high CPU load operation</h4>
 
 <p>Executing service with any other then EUR/USD values, e.g. PLN/EUR, causes special <strong>rate wizzard</strong> feature will be used. The feature is implemented 
 in <code class="highlighter-rouge">rateWizzard</code> method of <code class="highlighter-rouge">CurrencyProviderRest</code> class. 
@@ -561,12 +559,10 @@ echo "$DEMO_IP:$DEMO_PORT"
             "description": "My notes for demo of kubernetes features made in july 2017 for devs in my company.  I made it for people who didn't know what container and kubernetes are.  I tried to encourage them to start their adventure with kubernets.",
             "image": "https://stackify.com/wp-content/uploads/2018/03/quick-guide-to-kubernetes-1-881x441.png",
             "url": "https://rebyrg.github.io/kubernetes-demo/",
-            "articleBody": "Intro
-
-My notes for demo of kubernetes features made in july 2017 for devs in my company.
-I made it for people who didn’t know what container and kubernetes are.
+            "articleBody": "My notes made to demonstrate kubernetes features. The demo was in July 2017 for develelopers in company I work for.
+I did it for people who didn’t know what container and kubernetes are.
 I tried to encourage them to start their adventure with kubernets.
-Source code is available here: https://github.com/Rebyrg/k8s-demo
+Source code: https://github.com/Rebyrg/k8s-demo
 
 Application
 
@@ -616,7 +612,7 @@ export DEMO_PORT=$(kubectl get services k8s-demo-currency-provider -o jsonpath=&
 echo &quot;$DEMO_IP:$DEMO_PORT&quot;
 
 ",
-            "wordcount": "435",
+            "wordcount": "434",
             "inLanguage": "en",
             "dateCreated": "2017-07-16/",
             "datePublished": "2017-07-16/",
