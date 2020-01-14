@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>RebyrgsBlog | Dev site of DevOps blog</title>
+    <description>Dev site of DevOps blog by Rebyrg.</description>
+    <link>https://rebyrg.github.io/</link>
+    <atom:link href="https://rebyrg.github.io/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Tue, 14 Jan 2020 20:14:14 +0100</pubDate>
+    <lastBuildDate>Tue, 14 Jan 2020 20:14:14 +0100</lastBuildDate>
+    <generator>Jekyll v3.8.6</generator>
+    
+      <item>
+        <title>Kubernetes demo</title>
+        <description>&lt;h1 id=&quot;intro&quot;&gt;Intro&lt;/h1&gt; &lt;p&gt;My notes for demo of kubernetes features made in july 2017 for devs in my company. I made it for people who didn’t know what container and kubernetes are. I tried to encourage them to start their adventure with kubernets. Source code is available here: &lt;a href=&quot;https://github.com/Rebyrg/k8s-demo&quot;&gt;https://github.com/Rebyrg/k8s-demo&lt;/a&gt;&lt;/p&gt; &lt;h1 id=&quot;application&quot;&gt;Application&lt;/h1&gt; &lt;p&gt;It is a very simple spring boot application created for demonstration of basic kubernetes features. It also shows basic principles of creating spring boot applications which are deployed on a kubernetes cluster.&lt;/p&gt; &lt;p&gt;The application exposes only one simple service &lt;code class=&quot;highlighter-rouge&quot;&gt;/rate&lt;/code&gt; on spring boot http port (default 8080). The...</description>
+        <pubDate>Sun, 16 Jul 2017 01:48:05 +0200</pubDate>
+        <link>https://rebyrg.github.io/kubernetes-demo/</link>
+        <guid isPermaLink="true">https://rebyrg.github.io/kubernetes-demo/</guid>
+        
+        <category>kubernetes</category>
+        
+        <category>blog</category>
+        
+        <category>java</category>
+        
+        <category>kubernetes</category>
+      </item>
+    
+  </channel>
+</rss>
